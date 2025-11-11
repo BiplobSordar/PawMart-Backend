@@ -6,6 +6,7 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import connectDB from "./config/db.js";
+import userRoutes from "./routes/userRoutes.js"; 
 
 dotenv.config()
 
@@ -36,6 +37,10 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 app.use(limiter);
+
+
+
+app.use("/api/users",userRoutes );
 
 
 

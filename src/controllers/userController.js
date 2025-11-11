@@ -1,0 +1,88 @@
+import User from '../models/User.js'
+import jwt from 'jsonwebtoken'
+
+export const createUser = async (req, res) => {
+  try {
+    const { uid, email } = req.firebaseUser;
+    const { name, avatar } = req.body
+
+
+    
+    const existingUser = await User.findOne({ uid });
+    if (existingUser) {
+      return res.status(400).json({ message: "User with this UID already exists" });
+    }
+
+  
+    const emailExists = await User.findOne({ email });
+    if (emailExists) {
+      return res.status(400).json({ message: "User with this email already exists" });
+    }
+
+  
+  await User.create({
+      uid,
+      email,
+      name: name || "Unnamed User",
+      role: "user",
+      avatar
+
+    });
+
+
+
+    res.status(201).json({
+      message: "New user created successfully",
+      
+     
+    });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+export const loginUser = async (req, res) => {
+  try {
+    const { uid, email, name } = req.firebaseUser;
+
+    if (!uid || !email) {
+      return res.status(400).json({ message: "Invalid Firebase user data" });
+    }
+
+    
+    let user = await User.findOne({ uid });
+
+    
+    if (!user) {
+      user = await User.findOne({ email });
+    }
+
+  
+    if (!user) {
+      user = await User.create({
+        uid,
+        email,
+        name: name || "Unnamed User",
+        role: "user",
+      
+      });
+    } 
+ 
+    const jwtToken = jwt.sign(
+      { uid: user.uid, role: user.role, permissions: user.permissions },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      user,
+      token: jwtToken,
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
