@@ -2,11 +2,16 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
-import helmet from "helmet";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
+
 import rateLimit from "express-rate-limit";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js"; 
+import categoryRoutes from "./routes/categoryRoute.js"; 
+import productRoutes from "./routes/productRoute.js"; 
+
+import Product from "./models/Product.js";
 
 dotenv.config()
 
@@ -40,12 +45,24 @@ app.use(limiter);
 
 
 
+
 app.use("/api/users",userRoutes );
+app.use("/api/category",categoryRoutes );
+app.use("/api/products", productRoutes);
 
 
 
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to PawMart API" });
+
+app.get("/", async(req, res) => {
+
+try {
+  const result=await Product.find()
+  console.log(result)
+  res.json({ message: "Welcome to PawMart API" ,result:result.length});
+} catch (error) {
+  console.log(error)
+  
+}
 });
 
 

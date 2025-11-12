@@ -76,6 +76,14 @@ export const loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
+      res.cookie("token", jwtToken, {
+      httpOnly: true,
+      secure: false, 
+      sameSite: "None", 
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
+    });
+    console.log(jwtToken,'this is the token i generate')
+
     res.status(200).json({
       message: "Login successful",
       user,
