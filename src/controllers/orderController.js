@@ -11,7 +11,7 @@ export const createOrder = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized: User not authenticated" });
     }
 
-    
+
     const user = await User.findOne({ uid });
     if (!user) {
       return res.status(401).json({ message: "Unauthorized: User not found" });
@@ -32,7 +32,7 @@ export const createOrder = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-   
+
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -40,18 +40,18 @@ export const createOrder = async (req, res) => {
     const seller = await User.findOne({ uid: product.sellerUid });
 
 
-    if(!seller){
+    if (!seller) {
       return res.status(404).json({ message: "User not found" });
     }
 
-   
+
     const finalQuantity = isPet ? 1 : quantity || 1;
     const finalPrice = isPet ? 0 : price || product.price || 0;
 
-   
+
     const newOrder = await Order.create({
       productId,
-      buyerId: user._id, 
+      buyerId: user._id,
       quantity: finalQuantity,
       price: finalPrice,
       address,
@@ -59,7 +59,7 @@ export const createOrder = async (req, res) => {
       phone,
       notes,
       isPet: !!isPet,
-      sellerId:seller._id
+      sellerId: seller._id
     });
 
     res.status(201).json({
@@ -81,31 +81,31 @@ export const createOrder = async (req, res) => {
 
 export const getOrdersForMe = async (req, res) => {
   try {
-    const sellerId = req.user.id; 
+    const sellerId = req.user.id;
 
-   
+
     const orders = await Order.find({ sellerId })
       .populate({
         path: "productId",
-        select: "name isPet image", 
+        select: "name isPet image",
       })
       .populate({
         path: "buyerId",
         select: "name phone",
       })
       .sort({ createdAt: -1 });
-      console.log(orders)
+    console.log(orders)
 
-   
+
     const formattedOrders = orders.map((order) => ({
       _id: order._id,
       listing: {
-        _id: order.productId._id,
-        name: order.productId.name,
-        isPet: order.productId.isPet,
-        image: order.productId.image, 
+        _id: order.productId?._id,
+        name: order.productId?.name,
+        isPet: order.productId?.isPet,
+        image: order.productId?.image,
       },
-      buyerName: order.buyerId.name,
+      buyerName: order.buyerId?.name,
       price: order.price,
       quantity: order.quantity,
       address: order.address,

@@ -72,8 +72,8 @@ export const loginUser = async (req, res) => {
 
     const payload = {
       uid: user.uid,
-      id:user?._id,
-      email:user.email,
+      id: user?._id,
+      email: user.email,
       permissions: user.permissions || [],
       role: user.role || "user"
     };
@@ -85,13 +85,13 @@ export const loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    
-  res.cookie("token", jwtToken, {
-  httpOnly: true,
-  secure: false,     
-  sameSite: "Lax",  
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
+
+    res.cookie("token", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
 
     res.status(200).json({
@@ -109,12 +109,12 @@ export const loginUser = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-  
+
     res.cookie("token", "", {
-      httpOnly: true,           
-      secure: process.env.NODE_ENV === "production", 
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      expires: new Date(0),    
+      expires: new Date(0),
     });
 
     res.status(200).json({
