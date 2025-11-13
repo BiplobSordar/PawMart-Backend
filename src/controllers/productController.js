@@ -199,6 +199,7 @@ export const getMyListings = async (req, res) => {
   try {
   
     const { uid } = req.user;
+   
 
     if (!uid) {
       return res.status(401).json({ message: "Unauthorized: UID missing" });

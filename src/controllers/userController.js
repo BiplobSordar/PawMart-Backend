@@ -72,6 +72,7 @@ export const loginUser = async (req, res) => {
 
     const payload = {
       uid: user.uid,
+      id:user?._id,
       email:user.email,
       permissions: user.permissions || [],
       role: user.role || "user"
@@ -83,12 +84,14 @@ export const loginUser = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-    res.cookie("token", jwtToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+
+    
+  res.cookie("token", jwtToken, {
+  httpOnly: true,
+  secure: false,     
+  sameSite: "Lax",  
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
 
 
     res.status(200).json({
@@ -99,5 +102,30 @@ export const loginUser = async (req, res) => {
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+
+export const logout = (req, res) => {
+  try {
+  
+    res.cookie("token", "", {
+      httpOnly: true,           
+      secure: process.env.NODE_ENV === "production", 
+      sameSite: "Strict",
+      expires: new Date(0),    
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error during logout",
+    });
   }
 };

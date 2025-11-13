@@ -7,10 +7,10 @@ import helmet from "helmet";
 
 import rateLimit from "express-rate-limit";
 import connectDB from "./config/db.js";
-import userRoutes from "./routes/userRoutes.js"; 
-import categoryRoutes from "./routes/categoryRoute.js"; 
-import productRoutes from "./routes/productRoute.js"; 
-import orderRoutes from "./routes/orderRoute.js"; 
+import userRoutes from "./routes/userRoutes.js";
+import categoryRoutes from "./routes/categoryRoute.js";
+import productRoutes from "./routes/productRoute.js";
+import orderRoutes from "./routes/orderRoute.js";
 
 import Product from "./models/Product.js";
 import { verifyToken } from "./middlewares/verifyToken.js";
@@ -48,26 +48,22 @@ app.use(limiter);
 
 
 
-app.use("/api/users",userRoutes );
-app.use("/api/category",categoryRoutes );
+app.use("/api/users", userRoutes);
+app.use("/api/category", categoryRoutes);
 app.use("/api/products", productRoutes);
-app.use("/api/orders",verifyToken ,orderRoutes);
+app.use("/api/orders", verifyToken, orderRoutes);
 
 
 
 
-app.get("/", async(req, res) => {
+app.get("/", async (req, res) => {
 
-try {
-  const result=await Product.find()
-  console.log(result)
-  res.json({ message: "Welcome to PawMart API" ,result:result.length,result});
-} catch (error) {
-  console.log(error)
-  
-}
+
+  res.status(200).json({
+    message: "Welcome to PawMart API",
+    status: 200
+  });
 });
-
 
 
 const PORT = process.env.PORT || 5000;
