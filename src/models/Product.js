@@ -12,6 +12,7 @@ const productSchema = new mongoose.Schema({
   breed: { type: String },
   adoptionStatus: { type: String, enum: ["available", "adopted"], default: "available" },
   stock: { type: Number, default: function() { return this.isPet ? 1 : 0 } },
+  location:{type:String,required: true}
 }, { timestamps: true });
 
 const Product = mongoose.model("Product", productSchema);

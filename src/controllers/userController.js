@@ -7,20 +7,20 @@ export const createUser = async (req, res) => {
     const { name, avatar } = req.body
 
 
-    
+
     const existingUser = await User.findOne({ uid });
     if (existingUser) {
       return res.status(400).json({ message: "User with this UID already exists" });
     }
 
-  
+
     const emailExists = await User.findOne({ email });
     if (emailExists) {
       return res.status(400).json({ message: "User with this email already exists" });
     }
 
-  
-  await User.create({
+
+    await User.create({
       uid,
       email,
       name: name || "Unnamed User",
@@ -33,8 +33,8 @@ export const createUser = async (req, res) => {
 
     res.status(201).json({
       message: "New user created successfully",
-      
-     
+
+
     });
   } catch (error) {
     console.error("Error creating user:", error);
@@ -51,38 +51,45 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid Firebase user data" });
     }
 
-    
+
     let user = await User.findOne({ uid });
 
-    
+
     if (!user) {
       user = await User.findOne({ email });
     }
 
-  
+
     if (!user) {
       user = await User.create({
         uid,
         email,
         name: name || "Unnamed User",
         role: "user",
-      
+
       });
-    } 
- 
+    }
+
+    const payload = {
+      uid: user.uid,
+      email:user.email,
+      permissions: user.permissions || [],
+      role: user.role || "user"
+    };
+
+
     const jwtToken = jwt.sign(
-      { uid: user.uid, role: user.role, permissions: user.permissions },
+      payload,
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-
-      res.cookie("token", jwtToken, {
+    res.cookie("token", jwtToken, {
       httpOnly: true,
-      secure: false, 
-      sameSite: "None", 
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      secure: false,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    console.log(jwtToken,'this is the token i generate')
+
 
     res.status(200).json({
       message: "Login successful",

@@ -1,19 +1,59 @@
 import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema({
-  productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
-  productName: { type: String, required: true },
-  buyerUid: { type: String, required: true },
-  buyerName: { type: String, required: true },
-  email: { type: String },
-  quantity: { type: Number, default: 1 },
-  price: { type: Number, required: true },
-  address: { type: String },
-  phone: { type: String },
-  date: { type: Date, default: Date.now },
-  additionalNotes: { type: String },
-  status: { type: String, default: "pending" } // "pending", "completed", "cancelled"
-});
+const orderSchema = new mongoose.Schema(
+  {
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+    },
+    buyerId: {         // or userId
+       type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: function () {
+        return this.isPet ? 1 : 1;
+      },
+    },
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: function () {
+        return this.isPet ? 0 : 0;
+      },
+    },
+    address: {
+      type: String,
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+    notes: {
+      type: String,
+    },
+    isPet: {
+      type: Boolean,
+      default: false,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "completed", "cancelled"],
+      default: "pending",
+    },
+  },
+  { timestamps: true }
+);
 
-const Order = mongoose.model("Order", orderSchema);
-export default Order;
+export default mongoose.model("Order", orderSchema);
