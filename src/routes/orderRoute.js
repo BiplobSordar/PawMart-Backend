@@ -1,4 +1,4 @@
-// src/routes/productRoutes.js
+
 import express from "express";
 import { createOrder } from "../controllers/orderController.js";
 

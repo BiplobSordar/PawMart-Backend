@@ -1,4 +1,4 @@
-// src/routes/productRoutes.js
+
 import express from "express";
 import {
   addProductOrPet,
@@ -18,8 +18,6 @@ router.get("/my-listing", verifyToken, getMyListings);
 router.get("/", getProducts);
 router.get("/:id", getProductById);
 router.delete("/:id", verifyToken, deleteProduct);
-
-// Update a product
 router.put("/:id", verifyToken, updateProduct);
 
 export default router;

@@ -1,4 +1,4 @@
-// Middleware: verifyToken.js
+
 import jwt from "jsonwebtoken";
 
 export const verifyToken = (req, res, next) => {
@@ -9,9 +9,9 @@ export const verifyToken = (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded?.email, "✅ Decoded Token"); // Should show { uid, id, permissions, iat, exp }
 
-    req.user = decoded; // id is here
+
+    req.user = decoded; 
     next();
 
 
