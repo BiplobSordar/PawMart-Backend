@@ -81,16 +81,16 @@ export const createOrder = async (req, res) => {
 
 export const getOrdersForMe = async (req, res) => {
   try {
-    const sellerId = req.user.id;
+    const buyerId = req.user.id;
 
 
-    const orders = await Order.find({ sellerId })
+    const orders = await Order.find({ buyerId })
       .populate({
         path: "productId",
         select: "name isPet image",
       })
       .populate({
-        path: "buyerId",
+        path: "sellerId",
         select: "name phone",
       })
       .sort({ createdAt: -1 });
@@ -105,7 +105,7 @@ export const getOrdersForMe = async (req, res) => {
         isPet: order.productId?.isPet,
         image: order.productId?.image,
       },
-      buyerName: order.buyerId?.name,
+      sellerName: order.sellerId?.name,
       price: order.price,
       quantity: order.quantity,
       address: order.address,

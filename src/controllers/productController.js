@@ -73,55 +73,61 @@ export const addProductOrPet = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-  
     const {
       search = "",
       category = "",
       sort = "",
       page = 1,
       limit = 10,
-      featured,
+      fetured,
+      isPet,
+      recommendedFor,
     } = req.query;
 
-   
     const filter = {};
 
-    if (search) {
-      filter.name = { $regex: search, $options: "i" }; 
+  
+    if (search) filter.name = { $regex: search, $options: "i" };
+
+ 
+    if (category) filter.category = category;
+
+
+    if (fetured !== undefined) filter.fetured = JSON.parse(fetured);
+
+ 
+    if (isPet !== undefined) filter.isPet = JSON.parse(isPet);
+
+ 
+    if (recommendedFor) {
+      const baseProduct = await Product.findById(recommendedFor);
+      if (baseProduct) {
+        filter.category = baseProduct.category;
+        filter._id = { $ne: recommendedFor }; 
+      }
     }
 
-    if (category) {
-      filter.category = category;
-    }
 
-    if (featured) {
-      filter.featured = featured === "true";
-    }
-
-    
     let sortOption = {};
     if (sort === "latest") sortOption = { createdAt: -1 };
     else if (sort === "oldest") sortOption = { createdAt: 1 };
     else if (sort === "priceLow") sortOption = { price: 1 };
     else if (sort === "priceHigh") sortOption = { price: -1 };
 
-   
+    // Pagination
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);
     const skip = (pageNumber - 1) * pageSize;
 
-  
     const [products, total] = await Promise.all([
       Product.find(filter)
         .sort(sortOption)
         .skip(skip)
         .limit(pageSize)
-        .populate("category", "name"), 
+        .populate("category", "name"),
       Product.countDocuments(filter),
     ]);
-  
 
-   
     res.status(200).json({
       message: "Products fetched successfully",
       products,
@@ -131,10 +137,7 @@ export const getProducts = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching products:", error);
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
 
