@@ -13,6 +13,7 @@ if (!saBase64) {
 const saJson = JSON.parse(Buffer.from(saBase64, "base64").toString("utf8"));
 
 
+
 admin.initializeApp({
   credential: admin.credential.cert(saJson),
 });

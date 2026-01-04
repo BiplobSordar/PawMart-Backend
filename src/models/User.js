@@ -9,13 +9,14 @@ const userSchema = new mongoose.Schema({
   phone: { type: String },
   role: {
     type: String,
-    enum: ["user", "admin"],
+    enum: ["user", "seller"],
     default: "user"
   },
   permissions: {
     type: [String], // ["adopter", "breeder", "seller"]
     default: ["adopter"]
   },
+  address:{ type: String },
   createdAt: { type: Date, default: Date.now },
 });
 

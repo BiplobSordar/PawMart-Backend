@@ -11,9 +11,11 @@ import userRoutes from "./routes/userRoutes.js";
 import categoryRoutes from "./routes/categoryRoute.js";
 import productRoutes from "./routes/productRoute.js";
 import orderRoutes from "./routes/orderRoute.js";
+import sellerRoutes from "./routes/sellerRoutes.js";
 
 import Product from "./models/Product.js";
 import { verifyToken } from "./middlewares/verifyToken.js";
+import { sellerOnly } from "./middlewares/sellerOnly.js";
 
 dotenv.config()
 
@@ -70,6 +72,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", verifyToken, orderRoutes);
+app.use("/api/seller/", verifyToken, sellerOnly, sellerRoutes);
 
 
 

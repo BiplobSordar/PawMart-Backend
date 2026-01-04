@@ -129,3 +129,180 @@ export const logout = (req, res) => {
     });
   }
 };
+
+
+
+
+export const getMyProfile = async (req, res) => {
+  try {
+    
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized access",
+      });
+    }
+
+    const userId = req.user.id;
+
+
+    const user = await User.findById(userId).select("-password");
+
+  
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+  
+    return res.status(200).json({
+      success: true,
+      data: user,
+    });
+
+  } catch (error) {
+    console.error("GetMyProfile Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch profile",
+    });
+  }
+};
+
+
+
+
+
+
+export const updateMyProfile = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized access",
+      });
+    }
+
+    const userId = req.user.id;
+
+ 
+    const allowedFields = ["name", "email", "address", "phone", "avatar"];
+    const updates = {};
+
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    });
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid fields provided",
+      });
+    }
+
+
+    if (req.body.role) {
+      return res.status(403).json({
+        success: false,
+        message: "You cannot change role",
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update Profile Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update profile",
+    });
+  }
+};
+
+
+
+
+
+
+export const changeMyRole = async (req, res) => {
+  try {
+ 
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized access",
+      });
+    }
+
+    const userId = req.user.id;
+    const { role } = req.body;
+
+
+    if (!role) {
+      return res.status(400).json({
+        success: false,
+        message: "Role is required",
+      });
+    }
+
+  
+    const allowedRoles = ["user", "seller"];
+
+    if (!allowedRoles.includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role value",
+      });
+    }
+
+ 
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { role },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+   
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Role updated successfully",
+      data: updatedUser,
+    });
+
+  } catch (error) {
+    console.error("ChangeMyRole Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to change role",
+    });
+  }
+};
+
